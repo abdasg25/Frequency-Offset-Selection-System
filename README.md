@@ -63,7 +63,7 @@ The system works with **frequency scout series** where:
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/abdasg25/Frequency-Offset-Selection-System
 cd Frequency-Offset-Selection-System
 
 # Create virtual environment
