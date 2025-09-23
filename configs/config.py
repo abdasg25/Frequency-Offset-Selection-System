@@ -18,7 +18,7 @@ PIN_MEMORY = torch.cuda.is_available()
 
 # Data paths
 DATA_ROOT = "/Users/abdulrehman/fyp/1st_cohort_SAX"
-ANNOTATIONS_ROOT = "/Users/abdulrehman/fyp/Annotations"
+ANNOTATIONS_ROOT = "/Users/abdulrehman/fyp/annotations"
 OUTPUT_DIR = "/Users/abdulrehman/fyp/Frequency-Offset-Selection-System/outputs"
 
 # Create output directories

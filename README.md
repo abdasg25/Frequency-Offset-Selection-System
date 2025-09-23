@@ -2,18 +2,7 @@
 
 This project implements an advanced machine learning system for automatically selecting optimal frequency offsets in cardiac MRI frequency scout (FS) sequences using deep learning techniques.
 
-## 🤖 ML Approach Overview
 
-This system uses a **3D CNN with attention mechanisms** to learn optimal frequency selection patterns from training data, achieving clinical-grade accuracy for automated frequency offset selection.
-
-## System Architecture
-
-The ML-based frequency offset selection system consists of four main components:
-
-1. **Heart Segmentation**: Uses MONAI AttentionUNet to localize the heart ROI in frequency scout images
-2. **ML Feature Extraction**: 3D CNN processes frequency series to extract temporal-spatial patterns
-3. **Attention Mechanisms**: Channel and spatial attention focus on relevant image regions
-4. **Ensemble Prediction**: Combines classification and regression outputs for optimal frequency selection
 
 ## Dataset
 
@@ -37,14 +26,6 @@ The system works with **frequency scout series** where:
 3. The goal is to automatically select the frequency that minimizes artifacts in the heart region
 4. Your manual annotations (image_no) indicate which image in each series has the best image quality
 
-## Key Features
-
-- **ML-Based Selection**: 3D CNN with attention mechanisms for pattern learning
-- **Heart Segmentation**: MONAI AttentionUNet for precise ROI localization
-- **Ensemble Prediction**: Combines classification and regression approaches
-- **Confidence Scoring**: Provides prediction confidence for quality assessment
-- **Data Augmentation**: Robust training with augmented frequency series
-- **Comprehensive Evaluation**: Validation against expert annotations with clinical metrics
 
 ## Project Structure
 
@@ -77,43 +58,10 @@ pip install -r requirements.txt
 
 ## Usage
 
-### 1. Train Heart Segmentation Model
+### 1. Run Frequency Offset Selection
 ```bash
-python scripts/train_segmentation.py --config configs/segmentation_config.yaml
+python scripts/run_ml_frequency_selection.py
 ```
-
-### 2. Run Frequency Offset Selection
-```bash
-python scripts/run_frequency_selection.py --input_dir /path/to/dicom/series --output_dir ./outputs
-```
-
-### 3. Evaluate System Performance
-```bash
-python scripts/evaluate_system.py --predictions ./outputs --ground_truth ./annotations
-```
-
-## Methodology
-
-### Step 1: Heart Segmentation
-- Pre-trained MONAI AttentionUNet for whole heart segmentation
-- Localizes ROI where artifacts should be minimized
-- Processes 2D frequency scout images
-
-### Step 2: High-Frequency Component Extraction
-- Fourier transformation of ROI regions
-- High-pass filtering to extract high-frequency components
-- Inverse Fourier transformation and subtraction
-- Selection of N images with lowest high-frequency content
-
-### Step 3: Adaptive Weighting Map Generation
-- Pixel-wise median calculation from selected images
-- Weighting maps that penalize signal deviations from median
-- Adaptive weighting based on local image characteristics
-
-### Step 4: Optimal Frequency Selection
-- Averaging of weighting maps across frequency offsets
-- Selection of frame with maximum weighted percentage
-- Output of optimal frequency offset
 
 ## Expected Results
 

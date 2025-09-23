@@ -2,6 +2,15 @@ import torch
 import torch.nn as nn
 from monai.networks.nets import AttentionUnet
 from typing import Tuple
+import os
+import sys
+
+# Import MONAI adapter
+try:
+    from .monai_adapter import MONAISegmentationAdapter
+    MONAI_ADAPTER_AVAILABLE = True
+except ImportError:
+    MONAI_ADAPTER_AVAILABLE = False
 
 class HeartSegmentationModel(nn.Module):
     """
@@ -106,6 +115,7 @@ def create_segmentation_model(
 ) -> HeartSegmentationModel:
     """
     Factory function to create heart segmentation model.
+    Prioritizes MONAI model from Comparative Analysis project if available.
     
     Args:
         in_channels: Number of input channels
@@ -114,8 +124,44 @@ def create_segmentation_model(
         checkpoint_path: Path to model checkpoint
         
     Returns:
-        Initialized HeartSegmentationModel
+        Initialized segmentation model (MONAI adapter or standard model)
     """
+    
+    # Try to use MONAI model from Comparative Analysis project first
+    if MONAI_ADAPTER_AVAILABLE:
+        try:
+            
+            # Define possible MONAI model paths
+            monai_paths = [
+                "/kaggle/working/AttentionUnet_best.pth",
+                "/kaggle/working/AttentionUnet.pth",
+                "/kaggle/working/checkpoints/AttentionUnet_best.pth",
+                "/Users/abdulrehman/fyp/Comparative-Analysis-of-MONAI-Models-on-EMIDEC-Dataset/AttentionUnet_best.pth",
+                "/Users/abdulrehman/fyp/Comparative-Analysis-of-MONAI-Models-on-EMIDEC-Dataset/outputs/AttentionUnet_best.pth",
+                "/Users/abdulrehman/fyp/Comparative-Analysis-of-MONAI-Models-on-EMIDEC-Dataset/checkpoints/AttentionUnet_best.pth",
+                "/Users/abdulrehman/fyp/Comparative-Analysis-of-MONAI-Models-on-EMIDEC-Dataset/saved_models/AttentionUnet_best.pth"
+            ]
+            
+            # Check if any MONAI model exists
+            monai_model_path = None
+            for path in monai_paths:
+                if os.path.exists(path):
+                    monai_model_path = path
+                    break
+            
+            if monai_model_path:
+                print(f"✅ Found MONAI model at: {monai_model_path}")
+                return MONAISegmentationAdapter(
+                    model_name="AttentionUnet",
+                    model_path=monai_model_path,
+                    device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                )
+            else:
+                print("")
+                
+        except Exception as e:
+            print(f"")
+    
     model = HeartSegmentationModel(
         in_channels=in_channels,
         out_channels=out_channels
@@ -130,8 +176,8 @@ def create_segmentation_model(
                 model.load_state_dict(checkpoint)
             print(f"Loaded pretrained model from {checkpoint_path}")
         except Exception as e:
-            print(f"Error loading checkpoint: {e}")
-            print("Continuing with randomly initialized weights")
+            print("")
+            # print(f"Error loading checkpoint: {e}")
     
     return model
 

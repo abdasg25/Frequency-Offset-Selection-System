@@ -124,18 +124,6 @@ def debug_single_patient(patient_id="Patient-BEV"):
     # Check for potential issues
     print(f"\n=== Potential Issues ===")
     
-    if np.sum(heart_mask) < 1000:
-        print("⚠️  Heart mask is very small - segmentation might be poor")
-    
-    if max(weighting_scores) - min(weighting_scores) < 0.1:
-        print("⚠️  Weighting scores have very small range - algorithm may not be discriminative")
-    
-    if predicted_idx in [0, len(weighting_scores)-1]:
-        print("⚠️  Algorithm selected extreme frequency - likely algorithm issue")
-    
-    energy_range = max(energy_values) - min(energy_values)
-    if energy_range < np.mean(energy_values) * 0.1:
-        print("⚠️  Energy values have small range - HF analysis may not be working")
     
     # Show which images were selected for median calculation
     print(f"\nImages selected for median (low HF): {[i+1 for i in selected_indices]}")

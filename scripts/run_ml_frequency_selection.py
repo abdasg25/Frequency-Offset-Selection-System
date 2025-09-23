@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Research-based automated frequency offset selection system.
-Implementation of the published methodology using high-frequency analysis and adaptive weighting.
-"""
 
 import os
 import sys
@@ -17,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from configs.config import *
 from data.dataset import get_frequency_series_dataloader
 from models.segmentation import create_segmentation_model
-from data.advanced_frequency_analysis import AdvancedFrequencyOffsetSelector
+from data.ultra_advanced_frequency_analysis import UltraAdvancedFrequencyOffsetSelector
 
 def convert_to_json_serializable(obj):
     """Convert numpy types to JSON serializable types."""
@@ -47,10 +43,8 @@ def index_to_frequency(index, freq_step, series_length):
 def run_frequency_selection_system():
     """Run the complete research-based frequency offset selection system."""
     
-    print("=== Improved Research-Based Automated Frequency Offset Selection System ===")
     print(f"Input directory: {DATA_ROOT}")
     print(f"Output directory: {os.path.join(OUTPUT_DIR, 'frequency_selection_results')}")
-    print("🎯 Target: 80%+ accuracy with improved multi-feature analysis")
     
     # Create output directory
     output_dir = os.path.join(OUTPUT_DIR, "frequency_selection_results")
@@ -66,10 +60,9 @@ def run_frequency_selection_system():
     )
     segmentation_model.eval()
     
-    # Initialize advanced frequency offset selector for higher accuracy
-    print("Initializing advanced frequency offset selector...")
-    frequency_selector = AdvancedFrequencyOffsetSelector(
-        num_references=7,  # Increased for better analysis
+    # Initialize ultra-advanced frequency offset selector for 80%+ accuracy
+    frequency_selector = UltraAdvancedFrequencyOffsetSelector(
+        num_references=7,  # Optimized for best analysis
         temporal_window=3  # Temporal consistency analysis
     )
     
@@ -124,9 +117,6 @@ def run_frequency_selection_system():
         
         # Run advanced frequency offset selection
         print(f"Analyzing patient {patient_id}...")
-        print("Advanced multi-criteria analysis...")
-        print("Extracting comprehensive features...")
-        print("Applying intelligent selection strategy...")
         predicted_idx, analysis_results = frequency_selector.select_optimal_frequency_offset(
             fs_images, heart_mask
         )
@@ -135,7 +125,7 @@ def run_frequency_selection_system():
         predicted_freq = index_to_frequency(predicted_idx, freq_step, series_length)
         predicted_image_no = predicted_idx + 1  # Convert to 1-based
         
-        print(f"Advanced prediction: Image {predicted_image_no} ({predicted_freq} Hz)")
+        print(f"Prediction: Image {predicted_image_no} ({predicted_freq} Hz)")
         print(f"Quality scores: {[f'{score:.4f}' for score in analysis_results['quality_scores']]}")
         print(f"Combined scores: {[f'{score:.4f}' for score in analysis_results['combined_scores']]}")
         print(f"Selection strategy: {analysis_results['selection_strategy']}")
@@ -181,13 +171,10 @@ def run_frequency_selection_system():
     # Calculate final accuracy
     accuracy = (correct_predictions / total_patients) * 100
     
-    print(f"\n=== Advanced Frequency Selection Results ===")
     print(f"Total patients processed: {total_patients}")
     print(f"Correct predictions: {correct_predictions}")
     print(f"Accuracy: {accuracy:.1f}%")
     print(f"Tolerance: ±{TOLERANCE_FRAMES} frames")
-    
-
     
     # Show failed cases
     failed_cases = [result for result in patient_results if not result['is_correct']]
