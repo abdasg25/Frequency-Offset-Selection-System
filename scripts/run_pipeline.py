@@ -22,13 +22,13 @@ def main():
     """Main pipeline execution."""
     
     print("=" * 80)
-    print("EMIDEC-Powered Frequency Offset Selection Pipeline")
+    print("Frequency Offset Selection Pipeline")
     print("=" * 80)
     
     try:
         # Check if EMIDEC dataset is available
         if not os.path.exists(EMIDEC_DATASET_ROOT):
-            print(f"ERROR: EMIDEC dataset not available at: {EMIDEC_DATASET_ROOT}")
+            print(f"ERROR: EMIDEC dataset not available at: §{EMIDEC_DATASET_ROOT}")
             print("Please ensure the EMIDEC dataset is properly downloaded.")
             return False
         
