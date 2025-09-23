@@ -26,37 +26,19 @@ EMIDEC Dataset → AttentionUNet (3D) → Cardiac Segmentation Model
 Frequency Series → Heart Masks → Multi-Modal Analysis → Optimal Frequency
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
-### Complete Integrated Pipeline (Recommended)
+Run the complete integrated pipeline:
 ```bash
-# Install missing dependency first
-pip install einops
-
-# Run complete pipeline
 python scripts/run_pipeline.py
 ```
 
 This automatically:
-1. ✅ Checks EMIDEC dataset availability  
-2. 🔥 Trains AttentionUNet on EMIDEC using integrated comparative analysis code
-3. 🎯 Runs frequency offset selection with EMIDEC weights
+1. Checks EMIDEC dataset availability  
+2. Trains AttentionUNet on EMIDEC using integrated comparative analysis code
+3. Runs frequency offset selection with EMIDEC weights
 
-### Test Pipeline Components
-```bash
-python scripts/test_integrated_pipeline.py
-```
-
-### Manual Steps
-```bash
-# Step 1: Train EMIDEC segmentation model (standalone)
-python scripts/integrated_emidec_training.py
-
-# Step 2: Run frequency selection
-python scripts/run_ml_frequency_selection.py
-```
-
-## 🔧 Dependencies
+## Installation
 
 Install required packages:
 ```bash
@@ -118,26 +100,16 @@ The system works with **frequency scout series** where:
 git clone https://github.com/abdasg25/Frequency-Offset-Selection-System
 cd Frequency-Offset-Selection-System
 
-# Create virtual environment
-python -m venv fos_env
-source fos_env/bin/activate  # Linux/Mac
-# fos_env\Scripts\activate   # Windows
-
 # Install dependencies
 pip install -r requirements.txt
-```
 
-## Usage
-
-### 1. Run Frequency Offset Selection
-```bash
-python scripts/run_ml_frequency_selection.py
+# Run pipeline
+python scripts/run_pipeline.py
 ```
 
 ## Expected Results
 
 Based on the original paper methodology:
-- **Target Accuracy**: >90% compared to expert annotations
 - **Tolerance**: Maximum difference of 2 frames for failed cases
 - **Robustness**: Effective artifact reduction in heart ROI
 - **Automation**: Fully automated workflow without manual intervention
@@ -154,9 +126,3 @@ Based on the original paper methodology:
 - scikit-learn
 - numpy
 - scipy
-
-## References
-
-[1] Original paper on automated frequency offset selection in cardiac MRI
-[2] MONAI framework for medical imaging deep learning
-[3] Frequency scout imaging techniques in cardiac MRI
