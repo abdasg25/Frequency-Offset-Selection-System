@@ -1,16 +1,22 @@
 import torch
 import torch.nn as nn
 from monai.networks.nets import AttentionUnet
-from typing import Tuple
+from typing import Tuple, Optional
 import os
 import sys
 
-# Import MONAI adapter
+# Import MONAI adapter and EMIDEC adapter
 try:
     from .monai_adapter import MONAISegmentationAdapter
     MONAI_ADAPTER_AVAILABLE = True
 except ImportError:
     MONAI_ADAPTER_AVAILABLE = False
+
+try:
+    from .emidec_adapter import create_emidec_segmentation_model
+    EMIDEC_ADAPTER_AVAILABLE = True
+except ImportError:
+    EMIDEC_ADAPTER_AVAILABLE = False
 
 class HeartSegmentationModel(nn.Module):
     """
@@ -115,7 +121,7 @@ def create_segmentation_model(
 ) -> HeartSegmentationModel:
     """
     Factory function to create heart segmentation model.
-    Prioritizes MONAI model from Comparative Analysis project if available.
+    Prioritizes EMIDEC-trained model, then MONAI adapter if available.
     
     Args:
         in_channels: Number of input channels
@@ -124,10 +130,26 @@ def create_segmentation_model(
         checkpoint_path: Path to model checkpoint
         
     Returns:
-        Initialized segmentation model (MONAI adapter or standard model)
+        Initialized segmentation model (EMIDEC adapter, MONAI adapter, or standard model)
     """
     
-    # Try to use MONAI model from Comparative Analysis project first
+    # First priority: Use EMIDEC-trained model if checkpoint exists
+    if pretrained and checkpoint_path and os.path.exists(checkpoint_path):
+        if EMIDEC_ADAPTER_AVAILABLE:
+            try:
+                print(f"✅ Using EMIDEC-trained segmentation model from: {checkpoint_path}")
+                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                return create_emidec_segmentation_model(
+                    in_channels=in_channels,
+                    out_channels=out_channels,
+                    emidec_checkpoint_path=checkpoint_path,
+                    device=device
+                )
+            except Exception as e:
+                print(f"⚠️ Failed to load EMIDEC adapter: {str(e)}")
+                print("Falling back to standard model...")
+    
+    # Second priority: Try to use MONAI model from Comparative Analysis project
     if MONAI_ADAPTER_AVAILABLE:
         try:
             
@@ -157,17 +179,19 @@ def create_segmentation_model(
                     device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
                 )
             else:
-                print("")
+                print("ℹ️ No pre-trained MONAI model found, using standard model")
                 
         except Exception as e:
-            print(f"")
+            print(f"⚠️ MONAI adapter failed: {str(e)}")
     
+    # Fallback: Use standard model
+    print("🔄 Using standard HeartSegmentationModel")
     model = HeartSegmentationModel(
         in_channels=in_channels,
         out_channels=out_channels
     )
     
-    if pretrained and checkpoint_path:
+    if pretrained and checkpoint_path and os.path.exists(checkpoint_path):
         try:
             checkpoint = torch.load(checkpoint_path, map_location='cpu')
             if 'model_state_dict' in checkpoint:

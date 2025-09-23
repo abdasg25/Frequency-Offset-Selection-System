@@ -21,6 +21,10 @@ DATA_ROOT = "/Users/abdulrehman/fyp/1st_cohort_SAX"
 ANNOTATIONS_ROOT = "/Users/abdulrehman/fyp/annotations"
 OUTPUT_DIR = "/Users/abdulrehman/fyp/Frequency-Offset-Selection-System/outputs"
 
+# EMIDEC dataset paths for segmentation model training
+EMIDEC_DATASET_ROOT = "/Users/abdulrehman/fyp/Frequency-Offset-Selection-System/emidec-dataset-1.0.1"
+EMIDEC_PROJECT_ROOT = "/Users/abdulrehman/fyp/Comparative-Analysis-of-MONAI-Models-on-EMIDEC-Dataset"
+
 # Create output directories
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(os.path.join(OUTPUT_DIR, "checkpoints"), exist_ok=True)

@@ -1,12 +1,83 @@
-# ML-Based Automated Frequency Offset Selection for Cardiac MRI
+# EMIDEC-Powered Frequency Offset Selection for Cardiac MRI
 
-This project implements an advanced machine learning system for automatically selecting optimal frequency offsets in cardiac MRI frequency scout (FS) sequences using deep learning techniques.
+This project implements an advanced machine learning system for automatically selecting optimal frequency offsets in cardiac MRI frequency scout (FS) sequences using EMIDEC-trained deep learning models.
 
+## 🔬 Research Integration
 
+This system integrates with the **Comparative Analysis of MONAI Models on EMIDEC Dataset** project to provide:
+- **EMIDEC-trained AttentionUNet** for cardiac segmentation
+- **Automatic pipeline** from EMIDEC training to frequency selection
+- **Research-grade accuracy** targeting 80%+ performance
 
-## Dataset
+## 🧠 Pipeline Overview
 
-- **Format**: DICOM frequency scout series + PNG segmentation annotations
+### Phase 1: EMIDEC Training
+```
+EMIDEC Dataset → AttentionUNet (3D) → Cardiac Segmentation Model
+```
+
+### Phase 2: Weight Adaptation  
+```
+3D EMIDEC Weights → Adapter → 2D Frequency Scout Segmentation
+```
+
+### Phase 3: Frequency Selection
+```
+Frequency Series → Heart Masks → Multi-Modal Analysis → Optimal Frequency
+```
+
+## 🚀 Quick Start
+
+### Complete Integrated Pipeline (Recommended)
+```bash
+# Install missing dependency first
+pip install einops
+
+# Run complete pipeline
+python scripts/run_pipeline.py
+```
+
+This automatically:
+1. ✅ Checks EMIDEC dataset availability  
+2. 🔥 Trains AttentionUNet on EMIDEC using integrated comparative analysis code
+3. 🎯 Runs frequency offset selection with EMIDEC weights
+
+### Test Pipeline Components
+```bash
+python scripts/test_integrated_pipeline.py
+```
+
+### Manual Steps
+```bash
+# Step 1: Train EMIDEC segmentation model (standalone)
+python scripts/integrated_emidec_training.py
+
+# Step 2: Run frequency selection
+python scripts/run_ml_frequency_selection.py
+```
+
+## 🔧 Dependencies
+
+Install required packages:
+```bash
+pip install -r requirements.txt
+```
+
+Key dependencies:
+- `torch>=2.0.0`
+- `monai>=1.3.0` 
+- `einops>=0.7.0` (required for UNETR in comparative analysis)
+- `pydicom`, `nibabel`, `opencv-python`
+
+## 📊 Dataset Requirements
+
+### EMIDEC Dataset (for segmentation training)
+- **Location**: `Comparative-Analysis-of-MONAI-Models-on-EMIDEC-Dataset/emidec-dataset-1.0.1`
+- **Purpose**: Training cardiac segmentation model
+- **Format**: 3D cardiac MRI with expert segmentations
+
+### Cohort Dataset (for frequency selection)
+- **Location**: `1st_cohort_SAX/`
 - **Patients**: 25 cardiac MRI cases
 - **Acquisition**: Multiple 3T MRI scanners
 - **Frequency Series**: Each patient has 7-13 DICOM images at different frequency offsets

@@ -40,8 +40,52 @@ def index_to_frequency(index, freq_step, series_length):
     frequency_offset = (index - center_index) * freq_step
     return frequency_offset
 
+def check_and_prepare_segmentation_model():
+    """Check if EMIDEC-trained segmentation model exists, train if needed."""
+    checkpoint_path = os.path.join(OUTPUT_DIR, "checkpoints", "segmentation_best.pth")
+    
+    if not os.path.exists(checkpoint_path):
+        print("❌ EMIDEC-trained segmentation model not found!")
+        print(f"   Expected path: {checkpoint_path}")
+        print("\n🔄 Starting integrated EMIDEC AttentionUNet training...")
+        
+        try:
+            # Import and run integrated EMIDEC training
+            from integrated_emidec_training import train_attention_unet_on_emidec, check_emidec_dataset
+            
+            # Check dataset first
+            check_emidec_dataset()
+            
+            # Train model
+            trained_checkpoint, best_dice = train_attention_unet_on_emidec()
+            
+            print("✅ Integrated EMIDEC training completed successfully!")
+            print(f"   Checkpoint: {trained_checkpoint}")
+            print(f"   Best Dice: {best_dice:.4f}")
+            
+            # Verify checkpoint exists
+            if not os.path.exists(checkpoint_path):
+                raise FileNotFoundError(f"Checkpoint still not found after training: {checkpoint_path}")
+                
+        except Exception as e:
+            print(f"❌ Failed to train/prepare segmentation model: {str(e)}")
+            print("\n📝 Manual steps:")
+            print("1. Ensure EMIDEC dataset is available")
+            print("2. Check dependencies (monai, torch, etc.)")
+            print("3. Run: python scripts/integrated_emidec_training.py")
+            print("4. Then run this script again")
+            raise
+    else:
+        print(f"✅ Found EMIDEC-trained segmentation model: {checkpoint_path}")
+    
+    return checkpoint_path
+
 def run_frequency_selection_system():
     """Run the complete research-based frequency offset selection system."""
+    
+    print("=" * 80)
+    print("🧠 EMIDEC-Powered Frequency Offset Selection System")
+    print("=" * 80)
     
     print(f"Input directory: {DATA_ROOT}")
     print(f"Output directory: {os.path.join(OUTPUT_DIR, 'frequency_selection_results')}")
@@ -50,15 +94,20 @@ def run_frequency_selection_system():
     output_dir = os.path.join(OUTPUT_DIR, "frequency_selection_results")
     os.makedirs(output_dir, exist_ok=True)
     
-    # Load heart segmentation model
-    print("Loading heart segmentation model...")
+    # Check and prepare EMIDEC-trained segmentation model
+    print("\n📋 Step 1: Preparing EMIDEC-trained Segmentation Model")
+    checkpoint_path = check_and_prepare_segmentation_model()
+    
+    # Load heart segmentation model with EMIDEC-trained weights
+    print("\n📋 Step 2: Loading EMIDEC-trained AttentionUNet...")
     segmentation_model = create_segmentation_model(
         in_channels=1,
         out_channels=NUM_CLASSES,
         pretrained=True,
-        checkpoint_path=os.path.join(OUTPUT_DIR, "checkpoints", "segmentation_best.pth")
+        checkpoint_path=checkpoint_path
     )
     segmentation_model.eval()
+    print("✅ EMIDEC-trained segmentation model loaded successfully!")
     
     # Initialize ultra-advanced frequency offset selector for 80%+ accuracy
     frequency_selector = UltraAdvancedFrequencyOffsetSelector(
@@ -214,16 +263,7 @@ def run_frequency_selection_system():
     return final_results
 
 def main():
-    """Main function."""
     results = run_frequency_selection_system()
-    
-    # if results is not None:
-    #     # print(f"\n🎯 Target accuracy: 92.1% (published research benchmark)")
-    #     if results['accuracy'] >= 92.1:
-    #         print("🎉 Target accuracy achieved!")
-    #     else:
-    #         print(f"📈 Need {92.1 - results['accuracy']:.1f} more percentage points to reach target")
-    
     return results
 
 if __name__ == "__main__":
